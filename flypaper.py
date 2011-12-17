@@ -16,7 +16,7 @@ class FlyPaper(object):
         self._repo = RepoFactory.get_repo(self._repodir, self._startdate)
         changesetlist = self._repo.get_full_changesetlist()
         changesetlist.remove_changesets_without_matching_description(self._buglist.bugids)
-        
+
         files = {}
         for changeset in changesetlist.changesets:
             for filename in changeset.get_modified_files():
@@ -24,14 +24,14 @@ class FlyPaper(object):
                     files[filename] = 1
                 else:
                     files[filename] += 1
-        
+
         for filename in files:
             print str(files[filename]) + "  " + filename
 
 class ChangesetList(object):
     def __init__(self):
         self.changesets = []
-    
+
     def add(self, changeset):
         self.changesets.append(changeset)
 
@@ -68,7 +68,7 @@ class RepoFactory(object):
         if os.path.isdir(repodir + "/.hg"):
             return MercurialRepo(repodir, startdate)
         else:
-            raise Exception("No support repository found in: %s" % (repodir,))
+            raise Exception("No supported repository found in: %s" % (repodir,))
 
 class MercurialRepo(object):
     def __init__(self, repodir, startdate):
@@ -91,9 +91,9 @@ class MercurialRepo(object):
     def get_files_modified_in_changeset(self, commitid):
         "return list of filenames modified in changeset"
         #note: getting files split on space may be a problem
-        cmd = "hg log -r %s --template \"{files}\"" % (commitid,)
+        cmd = "hg log -r %s --template \"{file_mods} {file_adds} {file_dels}\"" % (commitid,)
         result = self.get_command_output(cmd)
-        return result.split(' ')
+        return [f for f in result.split(' ') if len(f.strip()) > 0]
 
     def get_command_output(self, cmd):
         "run a shell command and get the output"
