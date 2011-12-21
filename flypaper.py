@@ -9,10 +9,11 @@ import os
 from datetime import datetime
 
 class FlyPaper(object):
-    def __init__(self, bugid_file, repodir, startdate):
+    def __init__(self, bugid_file, repodir, startdate, showbugs):
         self._bugid_file = bugid_file
         self._repodir = repodir
         self._startdate = startdate
+        self._showbugs = showbugs
 
     def show_bug_catchers(self):
         self._buglist = BugList(self._bugid_file)
@@ -57,7 +58,11 @@ class FlyPaper(object):
             buggyfiles = results[score]
             buggyfiles.sort(cmp=lambda x, y: cmp(x.filename, y.filename))
             for buggyfile in buggyfiles:
-                print "%.03f" % score + " " + buggyfile.filename
+                output = "%.03f" % score + " " + buggyfile.filename
+                if self._showbugs:
+                    output += " "
+                    output += ",".join([x.__str__() for x in buggyfile.bugs.values()])
+                print output
 
 class Bug(object):
     def __init__(self, bugid):
@@ -227,10 +232,13 @@ if __name__ == '__main__':
                         help='directory which contains a code repository')
     parser.add_argument('--startdate', default='2011-01-01', type=unicode,
                         help='date to start looking in the repository')
+    parser.add_argument('--showbugs', default=False, action='store_true',
+                        help='show bug IDs in output')
     args = parser.parse_args()
 
     flypaper = FlyPaper(args.buglist,
                         args.repo,
-                        datetime.strptime(args.startdate, '%Y-%m-%d'))
+                        datetime.strptime(args.startdate, '%Y-%m-%d'),
+                        args.showbugs)
     flypaper.show_bug_catchers()
 
