@@ -1,7 +1,6 @@
 Flypaper
 ========
 Flypaper detects buggy files in your code base.
-
 The original idea for this project came from:  
 http://google-engtools.blogspot.com/2011/12/bug-prediction-at-google.html
 
@@ -21,7 +20,7 @@ In order to use Flypaper, you must have done a few things first:
 3. You must be able to get a list of the bug IDs from your bug tracking system.
 
 You invoke flypaper like this:  
-./flypaper.py --buglist <filename> --repo <repository directory> --startdate 2011-01-01
+    ./flypaper.py --buglist [filename] --repo [repository directory]--startdate 2011-01-01
 
 Flypaper will then output a list of filenames with corresponding bugginess
 scores sorted by bugginess.  The bugginess of a file is determined by the number
@@ -31,6 +30,5 @@ used is:
 Where t is the timestamp of the bug-fixing commit.  The timestamp used in the
 equation is normalized from 0 to 1, where 0 is the startdate and 1 is now
 (where now is when the algorithm was run).  For more explanation about this
-formula, take a look at the article which inspired this project here:
+formula, take a look at the article which inspired this project here:  
 http://google-engtools.blogspot.com/2011/12/bug-prediction-at-google.html
-
