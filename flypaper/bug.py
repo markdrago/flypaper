@@ -21,3 +21,8 @@ class Bug(object):
     def __str__(self):
         return str(self.bugid)
 
+class BugFactory(object):
+    @classmethod
+    def get_bug(clazz, bugid):
+        return Bug(bugid)
+

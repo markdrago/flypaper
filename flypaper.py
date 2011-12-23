@@ -17,7 +17,8 @@ class FlyPaper(object):
         self._showbugs = showbugs
 
     def show_bug_catchers(self):
-        self._buglist = BugList(self._bugid_file)
+        self._buglist = BugList()
+        self._buglist.read_bug_list(self._bugid_file)
         self._repo = RepoFactory.get_repo(self._repodir, self._startdate)
         self._changesetlist = self._repo.get_full_changesetlist()
 
