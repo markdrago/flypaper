@@ -11,6 +11,9 @@ class Bug(object):
         '''the score for a bug is the score for the latest changeset which
            fixes that bug, since the score for a changeset is based on recency
            alone, we just take the score for the highest scoring changeset'''
+        if len(self.fixing_changesets) == 0:
+            return 0
+
         if self.score is None:
             self.score = max([chg.get_score(startdate) for chg in self.fixing_changesets])
         return self.score
