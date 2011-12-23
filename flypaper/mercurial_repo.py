@@ -10,39 +10,46 @@ class MercurialRepo(object):
         self._repodir = repodir
         self._startdate = startdate
 
+    #NOTE: Since a commit may have 0 files changed (merge), we add a preceding
+    # '#' to the lines which contain the description and modified files.
+    #We do this to avoid having 3 consecutive newlines.  That would cause a
+    #problem since we're using newlines (and double newlines) as a delimiter.
+    #We use newlines because they will not be present in the description once
+    #we force it to just show the first line and it won't show up in the list
+    #of files either.  This way we can get all of the data we need with one
+    #command and we will be able to break it up safely and reliably.
     def get_full_changesetlist(self):
         "return ChangesetList of all changesets since startdate"
         changeset_list = ChangesetList()
-        self.add_changesets_with_dates_and_descriptions(changeset_list)
-        self.add_modified_files_to_changeset_list(changeset_list)
-        return changeset_list
 
-    def add_modified_files_to_changeset_list(self, changeset_list):
         startdatestr = self._startdate.strftime('%Y-%m-%d')
-        #note: getting files split on space may be a problem
-        cmd = 'hg log -d ">' + startdatestr + '" --template "{node}|{files}\n"'
+        cmd = 'hg log -d ">' + startdatestr + '" --template "{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n"'
         result = self.get_command_output(cmd)
 
-        for line in result.split('\n'):
-            if line.strip() == '':
+        for nodeblock in result.split("\n\n"):
+            if nodeblock.strip() == '':
                 continue
-            (commitid, filenames) = line.split('|', 1)
-            for filename in filenames.split(' '):
-                filename = filename.strip()
-                if len(filename) > 0:
-                    changeset_list.changesets[commitid].add_modified_file(filename)
 
-    def add_changesets_with_dates_and_descriptions(self, changeset_list):
-        startdatestr = self._startdate.strftime('%Y-%m-%d')
-        cmd = 'hg log -d ">' + startdatestr + '" --template "{node}|{date|shortdate}|{desc|firstline}\n"'
-        result = self.get_command_output(cmd)
+            (commitid, datestr, desc, files) = [
+                x.strip() for x in nodeblock.split("\n", 3)
+            ]
 
-        for line in result.split('\n'):
-            if line.strip() == '':
-                continue
-            (commitid, datestr, desc) = line.split('|', 2)
+            #remove those awkward prefixed # characters
+            desc = desc[1:]
+            files = files[1:]
+
             date = datetime.strptime(datestr, '%Y-%m-%d')
-            changeset_list.add(Changeset(commitid, date, desc))
+
+            #create the base changeset and add it to the list
+            changeset = Changeset(commitid, date, desc)
+            changeset_list.add(changeset)
+
+            #add the modified files to the changeset
+            if files.strip() == '':
+                continue
+            for filename in files.split(' '):
+                changeset.add_modified_file(filename)
+        return changeset_list
 
     def get_command_output(self, cmd):
         "run a shell command and get the output"
