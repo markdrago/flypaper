@@ -2,9 +2,8 @@ import math
 from datetime import datetime
 
 class Changeset(object):
-    def __init__(self, repo, commitid, date, description=''):
+    def __init__(self, commitid, date, description=''):
         self.score = None
-        self._repo = repo
         self.commitid = commitid
         self.description = description
         self.date = date

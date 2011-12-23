@@ -42,7 +42,7 @@ class MercurialRepo(object):
                 continue
             (commitid, datestr, desc) = line.split('|', 2)
             date = datetime.strptime(datestr, '%Y-%m-%d')
-            changeset_list.add(Changeset(self, commitid, date, desc))
+            changeset_list.add(Changeset(commitid, date, desc))
 
     def get_command_output(self, cmd):
         "run a shell command and get the output"
