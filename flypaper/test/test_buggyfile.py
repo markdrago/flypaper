@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from buggyfile import BuggyFile
 
@@ -11,7 +12,7 @@ class BuggyFileTest(unittest.TestCase):
         self.assertEquals(self.filename, self.buggyfile.filename)
 
     def test_buggyfile_stores_bugs(self):
-        bug = MockBug('bugid')
+        bug = MockBug()
         self.buggyfile.add_bug(bug)
         self.assertIs(bug, self.buggyfile._bugs.values()[0])
 
@@ -38,11 +39,30 @@ class BuggyFileTest(unittest.TestCase):
         self.buggyfile.add_bug(MockBug('bugid3', 3))
         self.assertEquals(6, self.buggyfile.get_score(None))
 
+    def test_buggyfile_memoizes_score(self):
+        bug = MockBug()
+        self.buggyfile.add_bug(bug)
+        self.buggyfile.get_score(None)
+        self.buggyfile.get_score(None)
+        self.buggyfile.get_score(None)
+        self.assertEquals(1, bug.num_times_score_checked)
+
+    def test_buggyfile_passes_startdate_to_bug_when_checking_score(self):
+        dt = datetime(2011, 12, 23, 7, 32, 0)
+        bug = MockBug()
+        self.buggyfile.add_bug(bug)
+        self.buggyfile.get_score(dt)
+        self.assertEquals(dt, bug.startdate_checked)
+
 class MockBug(object):
-    def __init__(self, bugid, score=0):
+    def __init__(self, bugid='bugid', score=0):
         self.bugid = bugid
         self.score = score
+        self.startdate_checked = None
+        self.num_times_score_checked = 0
 
     def get_score(self, startdate):
+        self.num_times_score_checked += 1
+        self.startdate_checked = startdate
         return self.score
 
