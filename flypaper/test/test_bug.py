@@ -3,7 +3,7 @@ from datetime import datetime
 
 from bug import Bug
 
-class BugTest(unittest.TestCase):
+class TestBug(unittest.TestCase):
     def setUp(self):
         self.bugid = 'abc'
         self.bug = Bug(self.bugid)

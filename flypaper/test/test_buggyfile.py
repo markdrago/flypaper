@@ -3,7 +3,7 @@ from datetime import datetime
 
 from buggyfile import BuggyFile
 
-class BuggyFileTest(unittest.TestCase):
+class TestBuggyFile(unittest.TestCase):
     def setUp(self):
         self.filename = 'myfile'
         self.buggyfile = BuggyFile(self.filename)

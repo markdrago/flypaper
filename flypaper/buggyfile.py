@@ -15,3 +15,8 @@ class BuggyFile(object):
             self._score = sum([bug.get_score(startdate) for bug in self._bugs.values()])
         return self._score
 
+class BuggyFileFactory(object):
+    @classmethod
+    def get_buggy_file(clazz, filename):
+        return BuggyFile(filename)
+
