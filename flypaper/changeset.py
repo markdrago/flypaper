@@ -13,6 +13,9 @@ class Changeset(object):
     def description_contains(self, needle):
         return needle in self.description
 
+    def bugs_fixed_count(self):
+        return len(self.bugs_fixed)
+
     def add_bug_fixed(self, bug):
         self.bugs_fixed.add(bug)
 
