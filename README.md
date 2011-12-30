@@ -20,7 +20,7 @@ In order to use Flypaper, you must have done a few things first:
 3. You must be able to get a list of the bug IDs from your bug tracking system.
 
 You invoke flypaper like this:  
-    ./flypaper.py --buglist [filename] --repo [repository directory]--startdate 2011-01-01
+    ./flypaper --buglist [filename] --repo [repository directory] --startdate 2011-01-01
 
 Flypaper will then output a list of filenames with corresponding bugginess
 scores sorted by bugginess.  The bugginess of a file is determined by the number
