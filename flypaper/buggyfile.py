@@ -12,11 +12,13 @@ class BuggyFile(object):
         '''the score for a file is the sum of the score for the bugs
            which were in it'''
         if self._score is None:
-            self._score = sum([bug.get_score(startdate) for bug in self.bugs.values()])
+            self._score = sum([bug.get_score(startdate)
+                for bug in self.bugs.values()]
+            )
         return self._score
+
 
 class BuggyFileFactory(object):
     @classmethod
     def get_buggy_file(clazz, filename):
         return BuggyFile(filename)
-

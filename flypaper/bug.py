@@ -15,14 +15,16 @@ class Bug(object):
             return 0
 
         if self._score is None:
-            self._score = max([chg.get_score(startdate) for chg in self.fixing_changesets])
+            self._score = max([chg.get_score(startdate)
+                for chg in self.fixing_changesets]
+            )
         return self._score
-    
+
     def __str__(self):
         return str(self.bugid)
+
 
 class BugFactory(object):
     @classmethod
     def get_bug(clazz, bugid):
         return Bug(bugid)
-

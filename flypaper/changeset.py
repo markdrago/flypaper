@@ -1,6 +1,7 @@
 import math
 from datetime import datetime
 
+
 class Changeset(object):
     def __init__(self, commitid, date, description=''):
         self.score = None
@@ -32,7 +33,6 @@ class Changeset(object):
         total_diff = today - startdate
         changeset_diff = self.date - startdate
 
-        time_ratio = changeset_diff.total_seconds() / total_diff.total_seconds()
+        ratio = changeset_diff.total_seconds() / total_diff.total_seconds()
 
-        return 1 / (1 + math.exp((-3 * time_ratio) + 3))
-
+        return 1 / (1 + math.exp((-3 * ratio) + 3))

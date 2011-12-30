@@ -3,6 +3,7 @@ from datetime import datetime
 
 from buggyfile import BuggyFile
 
+
 class TestBuggyFile(unittest.TestCase):
     def setUp(self):
         self.filename = 'myfile'
@@ -54,6 +55,7 @@ class TestBuggyFile(unittest.TestCase):
         self.buggyfile.get_score(dt)
         self.assertEquals(dt, bug.startdate_checked)
 
+
 class MockBug(object):
     def __init__(self, bugid='bugid', score=0):
         self.bugid = bugid
@@ -65,4 +67,3 @@ class MockBug(object):
         self.num_times_score_checked += 1
         self.startdate_checked = startdate
         return self.score
-

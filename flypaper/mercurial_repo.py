@@ -5,6 +5,7 @@ from datetime import datetime
 from flypaper.changeset_list import ChangesetList
 from flypaper.changeset import Changeset
 
+
 class MercurialRepo(object):
     def __init__(self, repodir, startdate):
         self._repodir = repodir
@@ -22,8 +23,9 @@ class MercurialRepo(object):
         "return ChangesetList of all changesets since startdate"
         changeset_list = ChangesetList()
 
-        startdatestr = self._startdate.strftime('%Y-%m-%d')
-        cmd = 'hg log -d ">' + startdatestr + '" --template "{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n"'
+        datestr = self._startdate.strftime('%Y-%m-%d')
+        hg_format = '{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n'
+        cmd = 'hg log -d ">' + datestr + '" --template "' + hg_format + '"'
         result = self.get_command_output(cmd)
 
         for nodeblock in result.split("\n\n"):
@@ -61,4 +63,3 @@ class MercurialRepo(object):
 
         os.chdir(oldpath)
         return result
-

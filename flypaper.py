@@ -9,6 +9,7 @@ from flypaper.bug_list import BugList
 from flypaper.buggyfile_list import BuggyFileList
 from flypaper.repo_factory import RepoFactory
 
+
 class FlyPaper(object):
     def __init__(self, bugid_file, repodir, startdate, showbugs):
         self._bugid_file = bugid_file
@@ -62,8 +63,9 @@ class FlyPaper(object):
             for buggyfile in buggyfiles:
                 output = "%.03f" % score + " " + buggyfile.filename
                 if self._showbugs:
+                    buglist = [x.__str__() for x in buggyfile.bugs.values()]
                     output += " "
-                    output += ",".join([x.__str__() for x in buggyfile.bugs.values()])
+                    output += ",".join(buglist)
                 print output
 
 if __name__ == '__main__':
@@ -85,4 +87,3 @@ if __name__ == '__main__':
                         datetime.strptime(args.startdate, '%Y-%m-%d'),
                         args.showbugs)
     flypaper.show_bug_catchers()
-

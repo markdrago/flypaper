@@ -2,6 +2,7 @@ import unittest
 
 from buggyfile_list import BuggyFileList
 
+
 class BuggyFileListTest(unittest.TestCase):
     def setUp(self):
         self.filelist = BuggyFileList()
@@ -13,7 +14,8 @@ class BuggyFileListTest(unittest.TestCase):
         mockbug = MockBug()
         self.filelist.add_buggy_file(mockbug, filename)
         self.assertEquals(1, len(self.filelist.filenames))
-        self.assertEquals(['myfile'], self.mock_buggy_file_factory.names_requested)
+        actual = self.mock_buggy_file_factory.names_requested
+        self.assertEquals(['myfile'], actual)
 
     def test_buggyfile_list_adds_bug_to_buggy_file(self):
         filename = 'myfile'
@@ -31,6 +33,7 @@ class BuggyFileListTest(unittest.TestCase):
         self.assertEquals(1, len(self.filelist.filenames))
         self.assertEquals(2, len(self.filelist.filenames[filename].bugs))
 
+
 class MockBuggyFileFactory(object):
     def __init__(self):
         self.names_requested = []
@@ -39,6 +42,7 @@ class MockBuggyFileFactory(object):
         self.names_requested.append(filename)
         return MockBuggyFile()
 
+
 class MockBuggyFile(object):
     def __init__(self):
         self.bugs = []
@@ -46,6 +50,6 @@ class MockBuggyFile(object):
     def add_bug(self, bug):
         self.bugs.append(bug)
 
+
 class MockBug(object):
     pass
-

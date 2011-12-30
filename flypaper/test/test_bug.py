@@ -3,6 +3,7 @@ from datetime import datetime
 
 from bug import Bug
 
+
 class TestBug(unittest.TestCase):
     def setUp(self):
         self.bugid = 'abc'
@@ -48,6 +49,7 @@ class TestBug(unittest.TestCase):
     def test_bug_to_string(self):
         self.assertEquals(self.bugid, str(self.bug))
 
+
 class MockChangeset(object):
     def __init__(self, score=0):
         self.score = score
@@ -58,4 +60,3 @@ class MockChangeset(object):
         self.num_times_score_checked += 1
         self.startdate_asked_for = startdate
         return self.score
-

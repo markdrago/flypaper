@@ -2,6 +2,7 @@ import unittest
 
 from bug_list import BugList
 
+
 class TestBugList(unittest.TestCase):
     def setUp(self):
         self.buglist = BugList()
@@ -28,7 +29,7 @@ class TestBugList(unittest.TestCase):
         actual.sort()
         self.assertEquals(expected, actual)
 
+
 class MockBugFactory(object):
     def get_bug(self, bugid):
         return None
-
