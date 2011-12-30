@@ -1,5 +1,5 @@
 import os
-from flypaper.mercurial_repo import MercurialRepo
+from mercurial_repo import MercurialRepo
 
 
 class RepoFactory(object):

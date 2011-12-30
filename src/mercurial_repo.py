@@ -2,8 +2,8 @@ import os
 import subprocess
 from datetime import datetime
 
-from flypaper.changeset_list import ChangesetList
-from flypaper.changeset import Changeset
+from changeset_list import ChangesetList
+from changeset import Changeset
 
 
 class MercurialRepo(object):

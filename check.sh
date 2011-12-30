@@ -1,7 +1,7 @@
 #!/bin/sh
 
 #run unit tests
-cd flypaper
+cd src
 python -m unittest discover
 test_result=$?
 cd ..

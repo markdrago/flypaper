@@ -5,9 +5,9 @@ import sys
 
 from datetime import datetime
 
-from flypaper.bug_list import BugList
-from flypaper.buggyfile_list import BuggyFileList
-from flypaper.repo_factory import RepoFactory
+from bug_list import BugList
+from buggyfile_list import BuggyFileList
+from repo_factory import RepoFactory
 
 
 class FlyPaper(object):
