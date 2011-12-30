@@ -20,5 +20,5 @@ class BuggyFile(object):
 
 class BuggyFileFactory(object):
     @classmethod
-    def get_buggy_file(clazz, filename):
+    def get_buggy_file(cls, filename):
         return BuggyFile(filename)

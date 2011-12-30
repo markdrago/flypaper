@@ -26,5 +26,5 @@ class Bug(object):
 
 class BugFactory(object):
     @classmethod
-    def get_bug(clazz, bugid):
+    def get_bug(cls, bugid):
         return Bug(bugid)
