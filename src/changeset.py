@@ -25,14 +25,16 @@ class Changeset(object):
 
     def get_score(self, startdate):
         if self.score is None:
-            self.score = self._calculate_score(startdate)
+            self.score = self._calculate_score(startdate, datetime.today())
         return self.score
 
-    def _calculate_score(self, startdate):
-        today = datetime.today().replace(hour=0, minute=0, second=0)
+    def _get_date_ratio(self, startdate, today):
+        today = today.replace(hour=0, minute=0, second=0)
+        startdate = startdate.replace(hour=0, minute=0, second=0)
         total_diff = today - startdate
         changeset_diff = self.date - startdate
 
-        ratio = changeset_diff.total_seconds() / total_diff.total_seconds()
+        return changeset_diff.total_seconds() / total_diff.total_seconds()
 
-        return 1 / (1 + math.exp((-3 * ratio) + 3))
+    def _calculate_score(self, date_ratio, scale=3):
+        return 1 / (1 + math.exp(((-1 * scale) * date_ratio) + scale))
