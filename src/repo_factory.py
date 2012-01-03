@@ -8,4 +8,9 @@ class RepoFactory(object):
         if os.path.isdir(repodir + "/.hg"):
             return MercurialRepo(repodir, startdate)
         else:
-            raise Exception("No supported repository found: %s" % (repodir,))
+            msg = "No supported repository found: %s" % (repodir,)
+            raise RepositoryNotFoundException(msg)
+
+
+class RepositoryNotFoundException(Exception):
+    pass
