@@ -10,6 +10,7 @@ class Changeset(object):
         self.date = date
         self.bugs_fixed = set()
         self.modified_files = set()
+        self._today = None
 
     def description_contains(self, needle):
         return needle in self.description
@@ -25,7 +26,14 @@ class Changeset(object):
 
     def get_score(self, startdate):
         if self.score is None:
-            self.score = self._calculate_score(startdate, datetime.today())
+
+            #this just lets us mock out today in the tests
+            today = datetime.today()
+            if self._today is not None:
+                today = self._today
+
+            date_ratio = self._get_date_ratio(startdate, today)
+            self.score = self._calculate_score(date_ratio)
         return self.score
 
     def _get_date_ratio(self, startdate, today):

@@ -50,3 +50,8 @@ class TestChangeset(unittest.TestCase):
     def test_score_calculation(self):
         result = self.changeset._calculate_score(0.9, 3)
         self.assertAlmostEqual(0.42555748, result, 7)
+
+    def test_get_score(self):
+        startdate = datetime(2011, 1, 1, 0, 0, 0)
+        self.changeset._today = datetime(2012, 1, 3, 19, 2, 0)
+        result = self.changeset.get_score(startdate)
