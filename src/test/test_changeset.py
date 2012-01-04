@@ -55,3 +55,4 @@ class TestChangeset(unittest.TestCase):
         startdate = datetime(2011, 1, 1, 0, 0, 0)
         self.changeset._today = datetime(2012, 1, 3, 19, 2, 0)
         result = self.changeset.get_score(startdate)
+        self.assertAlmostEqual(0.49335728, result, 7)
