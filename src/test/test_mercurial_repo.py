@@ -3,18 +3,21 @@ import unittest
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
+from datetime import datetime
 
 from mercurial_repo import MercurialRepo
 
 
 class TestMercurialRepo(unittest.TestCase):
     def setUp(self):
-        self.directory = mkdtemp('-flypaper-hg-repo-tests')
-        self.repo = MercurialRepo(self.directory)
-        self.rmtree = True
+        self.rmtree = False
+        self.repo = MercurialRepo('/tmp/non-existant-dir')
 
     def create_real_repo(self):
+        self.directory = mkdtemp('-flypaper-hg-repo-tests')
+        self.repo = MercurialRepo(self.directory)
         self.repo.get_command_output('hg init')
+        self.rmtree = True
 
     def tearDown(self):
         if self.rmtree:
@@ -57,6 +60,19 @@ class TestMercurialRepo(unittest.TestCase):
         logoutput = "%s\n%s\n" % (fields1.get_logoutput(),
                                   fields2.get_logoutput())
         chg_list = self.repo._create_changeset_list(logoutput)
+        self.assertEquals(2, len(chg_list.changesets))
+
+    def test_really_interacting_with_mercurial_repo(self):
+        self.create_real_repo()
+        commitopts = '-m "commit" -u "user name <u@d.com>"'
+        self.repo.get_command_output('echo hello > hello')
+        self.repo.get_command_output('hg add hello')
+        self.repo.get_command_output('hg commit ' + commitopts)
+        self.repo.get_command_output('echo goodbye > bye')
+        self.repo.get_command_output('hg add bye')
+        self.repo.get_command_output('hg commit ' + commitopts)
+        startdate = datetime(2011, 1, 4, 0, 0, 0)
+        chg_list = self.repo.get_full_changesetlist(startdate)
         self.assertEquals(2, len(chg_list.changesets))
 
 
