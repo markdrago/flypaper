@@ -20,37 +20,42 @@ class MercurialRepo(object):
     #command and we will be able to break it up safely and reliably.
     def get_full_changesetlist(self, startdate):
         "return ChangesetList of all changesets since startdate"
-        changeset_list = ChangesetList()
-
         datestr = startdate.strftime('%Y-%m-%d')
         hg_format = '{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n'
         cmd = 'hg log -d ">' + datestr + '" --template "' + hg_format + '"'
         result = self.get_command_output(cmd)
+        return self._create_changeset_list(result)
 
-        for nodeblock in result.split("\n\n"):
-            if nodeblock.strip() == '':
-                continue
+    def _create_changeset_list(self, full_logoutput):
+        changeset_list = ChangesetList()
+        for nodeblock in full_logoutput.split("\n\n"):
+            changeset = self._create_single_changeset(nodeblock)
+            if changeset is not None:
+                changeset_list.add(changeset)
+        return changeset_list
 
-            (commitid, datestr, desc, files) = [
-                x.strip() for x in nodeblock.split("\n", 3)
-            ]
+    def _create_single_changeset(self, logoutput):
+        if logoutput.strip() == '':
+            return None
 
-            #remove those awkward prefixed # characters
-            desc = desc[1:]
-            files = files[1:]
+        (commitid, datestr, desc, files) = [
+            x.strip() for x in logoutput.split("\n", 3)
+        ]
 
-            date = datetime.strptime(datestr, '%Y-%m-%d')
+        #remove those awkward prefixed # characters
+        desc = desc[1:].strip()
+        files = files[1:].strip()
 
-            #create the base changeset and add it to the list
-            changeset = Changeset(commitid, date, desc)
-            changeset_list.add(changeset)
+        date = datetime.strptime(datestr, '%Y-%m-%d')
 
-            #add the modified files to the changeset
-            if files.strip() == '':
-                continue
+        #create the base changeset
+        changeset = Changeset(commitid, date, desc)
+
+        #add the modified files to the changeset
+        if files.strip() != '':
             for filename in files.split(' '):
                 changeset.add_modified_file(filename)
-        return changeset_list
+        return changeset
 
     def get_command_output(self, cmd):
         "run a shell command and get the output"
