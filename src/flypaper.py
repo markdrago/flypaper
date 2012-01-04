@@ -20,11 +20,11 @@ class FlyPaper(object):
     def show_bug_catchers(self):
         self._buglist = BugList()
         self._buglist.read_bug_list(self._bugid_file)
-        self._repo = RepoFactory.get_repo(self._repodir, self._startdate)
-        self._changesetlist = self._repo.get_full_changesetlist()
+        self._repo = RepoFactory.get_repo(self._repodir)
+        self._changesets = self._repo.get_full_changesetlist(self._startdate)
 
         self._match_bugs_with_changesets()
-        self._changesetlist.remove_changesets_which_do_not_fix_a_bug()
+        self._changesets.remove_changesets_which_do_not_fix_a_bug()
 
         self._build_buggy_file_list()
         results = self._get_buggy_files_sorted_by_bugginess()
@@ -32,13 +32,13 @@ class FlyPaper(object):
 
     def _build_buggy_file_list(self):
         self._buggy_file_list = BuggyFileList()
-        for changeset in self._changesetlist.changesets.values():
+        for changeset in self._changesets.changesets.values():
             for filename in changeset.modified_files:
                 for bug in changeset.bugs_fixed:
                     self._buggy_file_list.add_buggy_file(bug, filename)
 
     def _match_bugs_with_changesets(self):
-        for changeset in self._changesetlist.changesets.values():
+        for changeset in self._changesets.changesets.values():
             for bugid in self._buglist.bugs.keys():
                 if changeset.description_contains(bugid):
                     bug = self._buglist.bugs[bugid]

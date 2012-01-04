@@ -3,7 +3,6 @@ import unittest
 import os
 from shutil import rmtree
 from tempfile import mkdtemp
-from datetime import datetime
 
 from mercurial_repo import MercurialRepo
 from repo_factory import RepositoryNotFoundException
@@ -22,14 +21,14 @@ class TestRepoFactory(unittest.TestCase):
     def test_get_repo_fails_when_directory_is_not_present(self):
         non_existant_dir = os.path.join(self.directory, 'dne')
         with self.assertRaises(RepositoryNotFoundException):
-            RepoFactory.get_repo(non_existant_dir, datetime.today())
+            RepoFactory.get_repo(non_existant_dir)
 
     def test_get_repo_fails_when_non_supported_repo(self):
         os.mkdir(os.path.join(self.directory, '.dne'))
         with self.assertRaises(RepositoryNotFoundException):
-            RepoFactory.get_repo(self.directory, datetime.today())
+            RepoFactory.get_repo(self.directory)
 
     def test_get_repo_returns_mercurial_repo(self):
         os.mkdir(os.path.join(self.directory, '.hg'))
-        repo = RepoFactory.get_repo(self.directory, datetime.today())
+        repo = RepoFactory.get_repo(self.directory)
         self.assertEquals(MercurialRepo, type(repo))

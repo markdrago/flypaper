@@ -7,9 +7,8 @@ from changeset import Changeset
 
 
 class MercurialRepo(object):
-    def __init__(self, repodir, startdate):
+    def __init__(self, repodir):
         self._repodir = repodir
-        self._startdate = startdate
 
     #NOTE: Since a commit may have 0 files changed (merge), we add a preceding
     # '#' to the lines which contain the description and modified files.
@@ -19,11 +18,11 @@ class MercurialRepo(object):
     #we force it to just show the first line and it won't show up in the list
     #of files either.  This way we can get all of the data we need with one
     #command and we will be able to break it up safely and reliably.
-    def get_full_changesetlist(self):
+    def get_full_changesetlist(self, startdate):
         "return ChangesetList of all changesets since startdate"
         changeset_list = ChangesetList()
 
-        datestr = self._startdate.strftime('%Y-%m-%d')
+        datestr = startdate.strftime('%Y-%m-%d')
         hg_format = '{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n'
         cmd = 'hg log -d ">' + datestr + '" --template "' + hg_format + '"'
         result = self.get_command_output(cmd)
