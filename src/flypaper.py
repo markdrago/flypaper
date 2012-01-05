@@ -7,35 +7,39 @@ from datetime import datetime
 
 from bug_list import BugList
 from buggyfile_list import BuggyFileList
+from changeset_list import ChangesetList
 from repo_factory import RepoFactory
 
 
 class FlyPaper(object):
     def __init__(self, bugid_file, repodir, startdate, showbugs):
         self._bugid_file = bugid_file
-        self._repodir = repodir
         self._startdate = startdate
         self._showbugs = showbugs
+        self._buglist = BugList()
+        self._buggy_file_list = BuggyFileList()
+        self._changesets = ChangesetList()
 
     def show_bug_catchers(self):
-        self._buglist = BugList()
+        #populate list of bugs
         self._buglist.read_bug_list(self._bugid_file)
-        self._repo = RepoFactory.get_repo(self._repodir)
-        self._changesets = self._repo.get_full_changesetlist(self._startdate)
 
+        #populate list of changesets
+        self._repo = RepoFactory.get_repo(repodir)
+        self._repo.get_full_changesetlist(self._startdate, self._changesets)
+
+        #match bugs with the changesets that fix them
         self._match_bugs_with_changesets()
+
+        #forget changesets which do not fix a bug
         self._changesets.remove_changesets_which_do_not_fix_a_bug()
 
+        #populate list of files which were modified when fixing bugs
         self._build_buggy_file_list()
+
+        #sort files by bugginess and output results
         results = self._get_buggy_files_sorted_by_bugginess()
         self._print_results(results)
-
-    def _build_buggy_file_list(self):
-        self._buggy_file_list = BuggyFileList()
-        for changeset in self._changesets.get_changesets():
-            for filename in changeset.modified_files:
-                for bug in changeset.bugs_fixed:
-                    self._buggy_file_list.add_buggy_file(bug, filename)
 
     def _match_bugs_with_changesets(self):
         for changeset in self._changesets.get_changesets():
@@ -44,6 +48,12 @@ class FlyPaper(object):
                     bug = self._buglist.bugs[bugid]
                     bug.add_fixing_changeset(changeset)
                     changeset.add_bug_fixed(bug)
+
+    def _build_buggy_file_list(self):
+        for changeset in self._changesets.get_changesets():
+            for filename in changeset.modified_files:
+                for bug in changeset.bugs_fixed:
+                    self._buggy_file_list.add_buggy_file(bug, filename)
 
     def _get_buggy_files_sorted_by_bugginess(self):
         scores = {}

@@ -6,8 +6,6 @@ from bug_list import BugList
 class TestBugList(unittest.TestCase):
     def setUp(self):
         self.buglist = BugList()
-        self.mock_bug_factory = MockBugFactory()
-        self.buglist.bug_factory = self.mock_bug_factory
 
     def test_read_bug_list_creates_single_bug(self):
         bug_seq = ['bugid1']
@@ -28,8 +26,3 @@ class TestBugList(unittest.TestCase):
         actual = self.buglist.bugs.keys()
         actual.sort()
         self.assertEquals(expected, actual)
-
-
-class MockBugFactory(object):
-    def get_bug(self, bugid):
-        return None

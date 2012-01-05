@@ -18,21 +18,19 @@ class MercurialRepo(object):
     #we force it to just show the first line and it won't show up in the list
     #of files either.  This way we can get all of the data we need with one
     #command and we will be able to break it up safely and reliably.
-    def get_full_changesetlist(self, startdate):
+    def get_full_changesetlist(self, startdate, changeset_list):
         "return ChangesetList of all changesets since startdate"
         datestr = startdate.strftime('%Y-%m-%d')
         hg_format = '{node}\n{date|shortdate}\n#{desc|firstline}\n#{files}\n\n'
         cmd = 'hg log -d ">' + datestr + '" --template "' + hg_format + '"'
         result = self.get_command_output(cmd)
-        return self._create_changeset_list(result)
+        self._populate_changeset_list(result, changeset_list)
 
-    def _create_changeset_list(self, full_logoutput):
-        changeset_list = ChangesetList()
+    def _populate_changeset_list(self, full_logoutput, changeset_list):
         for nodeblock in full_logoutput.split("\n\n"):
             changeset = self._create_single_changeset(nodeblock)
             if changeset is not None:
                 changeset_list.add(changeset)
-        return changeset_list
 
     def _create_single_changeset(self, logoutput):
         if logoutput.strip() == '':
