@@ -15,21 +15,21 @@ class TestBuggyFile(unittest.TestCase):
     def test_buggyfile_stores_bugs(self):
         bug = MockBug()
         self.buggyfile.add_bug(bug)
-        self.assertIs(bug, self.buggyfile.bugs.values()[0])
+        self.assertIs(bug, self.buggyfile.get_bugs()[0])
 
     def test_buggyfile_stores_multiple_bugs(self):
         bug1 = MockBug('bugid1')
         bug2 = MockBug('bugid2')
         self.buggyfile.add_bug(bug1)
         self.buggyfile.add_bug(bug2)
-        self.assertEquals(2, len(self.buggyfile.bugs))
+        self.assertEquals(2, len(self.buggyfile.get_bugs()))
 
     def test_buggyfile_refuses_to_store_duplicate_bug(self):
         bug1 = MockBug('bugid1')
         bug2 = MockBug('bugid1')
         self.buggyfile.add_bug(bug1)
         self.buggyfile.add_bug(bug2)
-        self.assertEquals(1, len(self.buggyfile.bugs))
+        self.assertEquals(1, len(self.buggyfile.get_bugs()))
 
     def test_buggyfile_returns_score_of_zero_when_zero_bugs(self):
         self.assertEquals(0, self.buggyfile.get_score(None))

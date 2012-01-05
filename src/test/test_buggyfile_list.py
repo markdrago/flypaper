@@ -7,13 +7,13 @@ class BuggyFileListTest(unittest.TestCase):
     def setUp(self):
         self.filelist = BuggyFileList()
         self.mock_buggy_file_factory = MockBuggyFileFactory()
-        self.filelist.buggy_file_factory = self.mock_buggy_file_factory
+        self.filelist._file_factory = self.mock_buggy_file_factory
 
     def test_buggyfile_list_creates_and_stores_buggy_file(self):
         filename = 'myfile'
         mockbug = MockBug()
         self.filelist.add_buggy_file(mockbug, filename)
-        self.assertEquals(1, len(self.filelist.filenames))
+        self.assertEquals(1, len(self.filelist.get_files()))
         actual = self.mock_buggy_file_factory.names_requested
         self.assertEquals(['myfile'], actual)
 
@@ -21,8 +21,8 @@ class BuggyFileListTest(unittest.TestCase):
         filename = 'myfile'
         mockbug = MockBug()
         self.filelist.add_buggy_file(mockbug, filename)
-        self.assertEquals(1, len(self.filelist.filenames[filename].bugs))
-        self.assertEquals(mockbug, self.filelist.filenames[filename].bugs[0])
+        self.assertEquals(1, len(self.filelist._filenames[filename].bugs))
+        self.assertEquals(mockbug, self.filelist._filenames[filename].bugs[0])
 
     def test_buggyfile_reuses_buggyfiles_it_has_already_created(self):
         filename = 'myfile'
@@ -30,8 +30,8 @@ class BuggyFileListTest(unittest.TestCase):
         mockbug2 = MockBug()
         self.filelist.add_buggy_file(mockbug1, filename)
         self.filelist.add_buggy_file(mockbug2, filename)
-        self.assertEquals(1, len(self.filelist.filenames))
-        self.assertEquals(2, len(self.filelist.filenames[filename].bugs))
+        self.assertEquals(1, len(self.filelist.get_files()))
+        self.assertEquals(2, len(self.filelist._filenames[filename].bugs))
 
 
 class MockBuggyFileFactory(object):
@@ -52,4 +52,5 @@ class MockBuggyFile(object):
 
 
 class MockBug(object):
-    pass
+    def __init__(self, bugid='abc'):
+        self.bugid = bugid

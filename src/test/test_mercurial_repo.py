@@ -60,7 +60,7 @@ class TestMercurialRepo(unittest.TestCase):
         logoutput = "%s\n%s\n" % (fields1.get_logoutput(),
                                   fields2.get_logoutput())
         chg_list = self.repo._create_changeset_list(logoutput)
-        self.assertEquals(2, len(chg_list.changesets))
+        self.assertEquals(2, len(chg_list.get_changesets()))
 
     def test_really_interacting_with_mercurial_repo(self):
         self.create_real_repo()
@@ -73,7 +73,7 @@ class TestMercurialRepo(unittest.TestCase):
         self.repo.get_command_output('hg commit ' + commitopts)
         startdate = datetime(2011, 1, 4, 0, 0, 0)
         chg_list = self.repo.get_full_changesetlist(startdate)
-        self.assertEquals(2, len(chg_list.changesets))
+        self.assertEquals(2, len(chg_list.get_changesets()))
 
 
 class ChangesetFields(object):

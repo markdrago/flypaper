@@ -32,13 +32,13 @@ class FlyPaper(object):
 
     def _build_buggy_file_list(self):
         self._buggy_file_list = BuggyFileList()
-        for changeset in self._changesets.changesets.values():
+        for changeset in self._changesets.get_changesets():
             for filename in changeset.modified_files:
                 for bug in changeset.bugs_fixed:
                     self._buggy_file_list.add_buggy_file(bug, filename)
 
     def _match_bugs_with_changesets(self):
-        for changeset in self._changesets.changesets.values():
+        for changeset in self._changesets.get_changesets():
             for bugid in self._buglist.bugs.keys():
                 if changeset.description_contains(bugid):
                     bug = self._buglist.bugs[bugid]
@@ -47,7 +47,7 @@ class FlyPaper(object):
 
     def _get_buggy_files_sorted_by_bugginess(self):
         scores = {}
-        for buggyfile in self._buggy_file_list.filenames.values():
+        for buggyfile in self._buggy_file_list.get_files():
             score = buggyfile.get_score(self._startdate)
             if score not in scores:
                 scores[score] = []
@@ -63,7 +63,7 @@ class FlyPaper(object):
             for buggyfile in buggyfiles:
                 output = "%.03f" % score + " " + buggyfile.filename
                 if self._showbugs:
-                    buglist = [x.__str__() for x in buggyfile.bugs.values()]
+                    buglist = [x.__str__() for x in buggyfile.get_bugs()]
                     output += " "
                     output += ",".join(buglist)
                 print output
