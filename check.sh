@@ -15,8 +15,6 @@ else
     pep8_result=$?
 fi
 
-if [ $test_result != 0 -o $pep8_result != 0 ]; then
-    exit 1
-fi
+#only return 0 if both tests returned 0
+exit $(( $test_result || $pep8_result))
 
-exit 0
