@@ -4,6 +4,7 @@ from datetime import datetime
 
 from changeset import Changeset
 from bug import Bug
+from buggyfile_list import BuggyFileList
 from flypaper import FlyPaper
 
 
@@ -38,3 +39,44 @@ class TestFlyPaper(unittest.TestCase):
         self.fp._build_buggy_file_list()
         self.assertEquals(1, len(self.fp._buggy_file_list._filenames))
         self.assertIn('file1', self.fp._buggy_file_list._filenames)
+
+    def test_sorting_buggy_files_by_bugginess(self):
+        buggy_file_list = BuggyFileList()
+        buggy_file_factory = MockBuggyFileFactory()
+        buggy_file_list._file_factory = buggy_file_factory
+
+        #create two buggy files with score 3, one with score 2
+        buggy_file_factory.next_score = 3
+        buggy_file_list.add_buggy_file(self.bug1, 'file1')
+        buggy_file_list.add_buggy_file(self.bug2, 'file2')
+        buggy_file_factory.next_score = 2
+        buggy_file_list.add_buggy_file(self.bug2, 'file3')
+        self.fp._buggy_file_list = buggy_file_list
+
+        results = self.fp._get_buggy_files_sorted_by_bugginess()
+
+        self.assertIn(3, results)
+        actual_with_3 = set([x.name for x in results[3]])
+        self.assertEquals(set(('file1', 'file2')), actual_with_3)
+        self.assertIn(2, results)
+        self.assertEquals('file3', results[2][0].name)
+
+
+class MockBuggyFileFactory(object):
+    def __init__(self):
+        self.next_score = 0
+
+    def get_buggy_file(self, name):
+        return MockBuggyFile(name, self.next_score)
+
+
+class MockBuggyFile(object):
+    def __init__(self, name, score):
+        self.score = score
+        self.name = name
+
+    def get_score(self, unused_date):
+        return self.score
+
+    def add_bug(self, bug):
+        pass
