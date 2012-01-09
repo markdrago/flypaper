@@ -40,7 +40,7 @@ class FlyPaper(object):
 
         #sort files by bugginess and output results
         results = self._get_buggy_files_sorted_by_bugginess()
-        self._print_results(results)
+        print self._get_output(results)
 
     def _match_bugs_with_changesets(self):
         for changeset in self._changesets.get_changesets():
@@ -65,19 +65,21 @@ class FlyPaper(object):
             scores[score].append(buggyfile)
         return scores
 
-    def _print_results(self, results):
+    def _get_output(self, results):
         scores = results.keys()
         scores.sort()
+        output = ""
         for score in scores:
             buggyfiles = results[score]
             buggyfiles.sort(cmp=lambda x, y: cmp(x.filename, y.filename))
             for buggyfile in buggyfiles:
-                output = "%.03f" % score + " " + buggyfile.filename
+                output += "%.03f" % score + " " + buggyfile.filename
                 if self._showbugs:
                     buglist = [x.__str__() for x in buggyfile.get_bugs()]
                     output += " "
                     output += ",".join(buglist)
-                print output
+                output += "\n"
+        return output
 
 if __name__ == '__main__':
     description = 'Flypaper shows you the files which tend to attract bugs'
