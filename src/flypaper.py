@@ -76,10 +76,11 @@ class FlyPaper(object):
             sorted_buggy_files.extend(buggyfiles)
         return sorted_buggy_files
 
-    def _get_output(self, buggy_files):
+    def _get_output(self, buggyfiles):
         output = ""
         for buggyfile in buggyfiles:
-            output += "%.03f" % score + " " + buggyfile.filename
+            score_str = "%.03f" % buggyfile.get_score(self._startdate)
+            output += score_str + " " + buggyfile.filename
             if self._showbugs:
                 buglist = [x.__str__() for x in buggyfile.get_bugs()]
                 output += " "

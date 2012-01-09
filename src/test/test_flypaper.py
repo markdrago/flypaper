@@ -62,6 +62,35 @@ class TestFlyPaper(unittest.TestCase):
         self.assertEquals('file3', results[2].filename)
         self.assertEquals('file0', results[3].filename)
 
+    def test_output_plain_text_without_bugs(self):
+        self.fp._showbugs = False
+        buggy_files = []
+        buggy_files.append(MockBuggyFile('file3', 3.45678))
+        buggy_files.append(MockBuggyFile('file2', 2.34321))
+        buggy_files.append(MockBuggyFile('file1', 1.2))
+
+        output = self.fp._get_output(buggy_files)
+        expected = "3.457 file3\n"
+        expected += "2.343 file2\n"
+        expected += "1.200 file1\n"
+        self.assertEquals(expected, output)
+
+    def test_output_plain_text_with_bugs(self):
+        self.fp._showbugs = True
+        buggy_files = []
+        bf1 = MockBuggyFile('file1', 3.456)
+        bf1.add_bug(MockBug('bug1'))
+        bf1.add_bug(MockBug('bug2'))
+        buggy_files.append(bf1)
+        bf2 = MockBuggyFile('file2', 2.345)
+        bf2.add_bug(MockBug('bug3'))
+        buggy_files.append(bf2)
+
+        output = self.fp._get_output(buggy_files)
+        expected = "3.456 file1 bug1,bug2\n"
+        expected += "2.345 file2 bug3\n"
+        self.assertEquals(expected, output)
+
 
 class MockBuggyFileFactory(object):
     def __init__(self):
@@ -75,9 +104,21 @@ class MockBuggyFile(object):
     def __init__(self, name, score):
         self.score = score
         self.filename = name
+        self.bugs = []
 
     def get_score(self, unused_date):
         return self.score
 
     def add_bug(self, bug):
-        pass
+        self.bugs.append(bug)
+
+    def get_bugs(self):
+        return self.bugs
+
+
+class MockBug(object):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
