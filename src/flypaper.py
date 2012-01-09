@@ -57,28 +57,34 @@ class FlyPaper(object):
                     self._buggy_file_list.add_buggy_file(bug, filename)
 
     def _get_buggy_files_sorted_by_bugginess(self):
-        scores = {}
+        #create dict mapping scores to buggy files
+        score_map = {}
         for buggyfile in self._buggy_file_list.get_files():
             score = buggyfile.get_score(self._startdate)
-            if score not in scores:
-                scores[score] = []
-            scores[score].append(buggyfile)
-        return scores
+            if score not in score_map:
+                score_map[score] = []
+            score_map[score].append(buggyfile)
 
-    def _get_output(self, results):
-        scores = results.keys()
-        scores.sort()
-        output = ""
-        for score in scores:
-            buggyfiles = results[score]
+        #create list sorted by score
+        sorted_buggy_files = []
+        all_scores = score_map.keys()
+        all_scores.sort()
+        all_scores.reverse()
+        for score in all_scores:
+            buggyfiles = score_map[score]
             buggyfiles.sort(cmp=lambda x, y: cmp(x.filename, y.filename))
-            for buggyfile in buggyfiles:
-                output += "%.03f" % score + " " + buggyfile.filename
-                if self._showbugs:
-                    buglist = [x.__str__() for x in buggyfile.get_bugs()]
-                    output += " "
-                    output += ",".join(buglist)
-                output += "\n"
+            sorted_buggy_files.extend(buggyfiles)
+        return sorted_buggy_files
+
+    def _get_output(self, buggy_files):
+        output = ""
+        for buggyfile in buggyfiles:
+            output += "%.03f" % score + " " + buggyfile.filename
+            if self._showbugs:
+                buglist = [x.__str__() for x in buggyfile.get_bugs()]
+                output += " "
+                output += ",".join(buglist)
+            output += "\n"
         return output
 
 if __name__ == '__main__':

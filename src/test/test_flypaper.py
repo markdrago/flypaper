@@ -45,7 +45,9 @@ class TestFlyPaper(unittest.TestCase):
         buggy_file_factory = MockBuggyFileFactory()
         buggy_file_list._file_factory = buggy_file_factory
 
-        #create two buggy files with score 3, one with score 2
+        #create a few buggy files with different scores
+        buggy_file_factory.next_score = 1
+        buggy_file_list.add_buggy_file(self.bug1, 'file0')
         buggy_file_factory.next_score = 3
         buggy_file_list.add_buggy_file(self.bug1, 'file1')
         buggy_file_list.add_buggy_file(self.bug2, 'file2')
@@ -55,11 +57,10 @@ class TestFlyPaper(unittest.TestCase):
 
         results = self.fp._get_buggy_files_sorted_by_bugginess()
 
-        self.assertIn(3, results)
-        actual_with_3 = set([x.name for x in results[3]])
-        self.assertEquals(set(('file1', 'file2')), actual_with_3)
-        self.assertIn(2, results)
-        self.assertEquals('file3', results[2][0].name)
+        self.assertEquals('file1', results[0].filename)
+        self.assertEquals('file2', results[1].filename)
+        self.assertEquals('file3', results[2].filename)
+        self.assertEquals('file0', results[3].filename)
 
 
 class MockBuggyFileFactory(object):
@@ -73,7 +74,7 @@ class MockBuggyFileFactory(object):
 class MockBuggyFile(object):
     def __init__(self, name, score):
         self.score = score
-        self.name = name
+        self.filename = name
 
     def get_score(self, unused_date):
         return self.score
