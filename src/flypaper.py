@@ -16,6 +16,7 @@ class FlyPaper(object):
         self._bugid_file = bugid_file
         self._startdate = startdate
         self._showbugs = showbugs
+        self._repodir = repodir
         self._buglist = BugList()
         self._buggy_file_list = BuggyFileList()
         self._changesets = ChangesetList()
@@ -25,7 +26,7 @@ class FlyPaper(object):
         self._buglist.read_bug_list(self._bugid_file)
 
         #populate list of changesets
-        self._repo = RepoFactory.get_repo(repodir)
+        self._repo = RepoFactory.get_repo(self._repodir)
         self._repo.get_full_changesetlist(self._startdate, self._changesets)
 
         #match bugs with the changesets that fix them
