@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import argparse
+import json
 import sys
 
 from datetime import datetime
@@ -12,11 +13,13 @@ from repo_factory import RepoFactory
 
 
 class FlyPaper(object):
-    def __init__(self, bugid_file, repodir, startdate, showbugs):
+    def __init__(self, bugid_file, repodir, startdate, showbugs,
+                 output_format):
         self._bugid_file = bugid_file
         self._startdate = startdate
         self._showbugs = showbugs
         self._repodir = repodir
+        self._output_format = output_format
         self._buglist = BugList()
         self._buggy_file_list = BuggyFileList()
         self._changesets = ChangesetList()
@@ -77,6 +80,11 @@ class FlyPaper(object):
         return sorted_buggy_files
 
     def _get_output(self, buggyfiles):
+        if self._output_format == 'json':
+            return self._get_output_json(buggyfiles)
+        return self._get_output_plain_text(buggyfiles)
+
+    def _get_output_plain_text(self, buggyfiles):
         output = ""
         for buggyfile in buggyfiles:
             score_str = "%.03f" % buggyfile.get_score(self._startdate)
@@ -87,6 +95,19 @@ class FlyPaper(object):
                 output += ",".join(buglist)
             output += "\n"
         return output
+
+    def _get_output_json(self, buggyfiles):
+        out_obj = {}
+        files = []
+        for buggyfile in buggyfiles:
+            onefile = {}
+            onefile['filename'] = buggyfile.filename
+            onefile['score'] = buggyfile.get_score(self._startdate)
+            if self._showbugs:
+                onefile['bugs'] = [x.__str__() for x in buggyfile.get_bugs()]
+            files.append(onefile)
+        out_obj['files'] = files
+        return json.dumps(out_obj, sort_keys=True, indent=2)
 
 if __name__ == '__main__':
     description = 'Flypaper shows you the files which tend to attract bugs'
@@ -100,10 +121,12 @@ if __name__ == '__main__':
                         help='date to start looking in the repository')
     parser.add_argument('--showbugs', default=False, action='store_true',
                         help='show bug IDs in output')
+    parser.add_argument('--output-format', default='plain', type=unicode,
+                        help='set to json to get json output')
     args = parser.parse_args()
 
     flypaper = FlyPaper(args.buglist,
                         args.repo,
                         datetime.strptime(args.startdate, '%Y-%m-%d'),
-                        args.showbugs)
+                        args.showbugs, args.output_format)
     flypaper.show_bug_catchers()

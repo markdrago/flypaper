@@ -1,4 +1,5 @@
 import unittest
+import json
 
 from datetime import datetime
 
@@ -10,7 +11,8 @@ from flypaper import FlyPaper
 
 class TestFlyPaper(unittest.TestCase):
     def setUp(self):
-        self.fp = FlyPaper(None, None, datetime(2011, 1, 1, 0, 0, 0), False)
+        self.fp = FlyPaper(None, None, datetime(2011, 1, 1, 0, 0, 0), False,
+                           'plain')
 
         #create a few bugs and changesets
         bug1id = 'bug1'
@@ -64,10 +66,7 @@ class TestFlyPaper(unittest.TestCase):
 
     def test_output_plain_text_without_bugs(self):
         self.fp._showbugs = False
-        buggy_files = []
-        buggy_files.append(MockBuggyFile('file3', 3.45678))
-        buggy_files.append(MockBuggyFile('file2', 2.34321))
-        buggy_files.append(MockBuggyFile('file1', 1.2))
+        buggy_files = self.prepare_list_for_output_without_bugs()
 
         output = self.fp._get_output(buggy_files)
         expected = "3.457 file3\n"
@@ -75,8 +74,54 @@ class TestFlyPaper(unittest.TestCase):
         expected += "1.200 file1\n"
         self.assertEquals(expected, output)
 
+    def test_output_json_without_bugs(self):
+        self.fp._showbugs = False
+        self.fp._output_format = 'json'
+        buggy_files = self.prepare_list_for_output_without_bugs()
+
+        output = self.fp._get_output(buggy_files)
+        expected = self.get_expected_json_output(buggy_files, False)
+        self.assertEquals(expected, output)
+
+    def test_output_json_with_bugs(self):
+        self.fp._showbugs = True
+        self.fp._output_format = 'json'
+        buggy_files = self.prepare_list_for_output_with_bugs()
+
+        output = self.fp._get_output(buggy_files)
+        expected = self.get_expected_json_output(buggy_files, True)
+        self.assertEquals(expected, output)
+
+    def get_expected_json_output(self, buggy_files, showbugs):
+        expected = {}
+        files = []
+        for f in buggy_files:
+            entry = {}
+            entry['filename'] = f.filename
+            entry['score'] = f.score
+            if showbugs:
+                entry['bugs'] = [bug.bugid for bug in f.get_bugs()]
+            files.append(entry)
+        expected['files'] = files
+        return json.dumps(expected, sort_keys=True, indent=2)
+
     def test_output_plain_text_with_bugs(self):
         self.fp._showbugs = True
+        buggy_files = self.prepare_list_for_output_with_bugs()
+
+        output = self.fp._get_output(buggy_files)
+        expected = "3.456 file1 bug1,bug2\n"
+        expected += "2.345 file2 bug3\n"
+        self.assertEquals(expected, output)
+
+    def prepare_list_for_output_without_bugs(self):
+        buggy_files = []
+        buggy_files.append(MockBuggyFile('file3', 3.45678))
+        buggy_files.append(MockBuggyFile('file2', 2.34321))
+        buggy_files.append(MockBuggyFile('file1', 1.2))
+        return buggy_files
+
+    def prepare_list_for_output_with_bugs(self):
         buggy_files = []
         bf1 = MockBuggyFile('file1', 3.456)
         bf1.add_bug(MockBug('bug1'))
@@ -85,11 +130,7 @@ class TestFlyPaper(unittest.TestCase):
         bf2 = MockBuggyFile('file2', 2.345)
         bf2.add_bug(MockBug('bug3'))
         buggy_files.append(bf2)
-
-        output = self.fp._get_output(buggy_files)
-        expected = "3.456 file1 bug1,bug2\n"
-        expected += "2.345 file2 bug3\n"
-        self.assertEquals(expected, output)
+        return buggy_files
 
 
 class MockBuggyFileFactory(object):
@@ -119,6 +160,7 @@ class MockBuggyFile(object):
 class MockBug(object):
     def __init__(self, name):
         self.name = name
+        self.bugid = name
 
     def __str__(self):
         return self.name
