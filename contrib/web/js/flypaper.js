@@ -1,25 +1,37 @@
 var RESULTS_LOCATION = "flypaper_results.json";
 var OPTIONS_LOCATION = "options.json";
+var PAGE_SIZE = 100;
 
 $(document).ready(function() {
     get_json_via_ajax(OPTIONS_LOCATION,
         function(options) {
-            prepare_ui();
+            prepare_table();
             get_json_via_ajax(RESULTS_LOCATION,
                 function(results) {
-                    update_ui(results, options);
+                    add_data_rows(results, options, PAGE_SIZE);
+                    prepare_more_button(results, options);
                 }
             );
         }
     );
 });
 
-function prepare_ui() {
+function prepare_table() {
     //initialize sorting
     $("table#results").tablesorter({
         //disable sorting of the bugs column
         headers: { 2: { sorter: false } }
     });
+}
+
+function prepare_more_button(results, options) {
+    $('#more').click(function() {
+        add_data_rows(results, options, PAGE_SIZE);
+    });
+}
+
+function get_displayed_rows_count() {
+    return $("table#results tr").length;
 }
 
 function get_json_via_ajax(filename, callback) {
@@ -33,9 +45,14 @@ function get_json_via_ajax(filename, callback) {
     });
 }
 
-function update_ui(results, options) {
+function add_data_rows(results, options, limit) {
     var rows = "";
-    for (var i in results.files) {
+
+    //figure out which rows to add
+    var start = get_displayed_rows_count();
+    var stop = Math.min(start + limit, results.files.length);
+
+    for (var i = start; i < stop; i++) {
         var file = results.files[i];
         var score = new Number(file.score);
         rows += "<tr>";
@@ -47,11 +64,15 @@ function update_ui(results, options) {
 
     var table = $('table#results');
     var tbody = table.find('tbody');
-    tbody.empty();
     tbody.append(rows);
 
     //tell tablesorter that we changed the data underneath it
-    table.trigger("update"); 
+    table.trigger("update");
+
+    //remove more button if we have shown all
+    if (get_displayed_rows_count() >= results.files.length) {
+        $('#more').hide();
+    }
 }
 
 function get_buglist(bugs, linkformat) {
