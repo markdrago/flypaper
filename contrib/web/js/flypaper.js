@@ -1,10 +1,13 @@
 var RESULTS_LOCATION = "flypaper_results.json";
 
 $(document).ready(function() {
-
+    prepare_ui();
     get_json_via_ajax(RESULTS_LOCATION, update_ui);
-
 });
+
+function prepare_ui() {
+    $("table#results").tablesorter();
+}
 
 function get_json_via_ajax(filename, callback) {
     $.ajax({
@@ -28,7 +31,11 @@ function update_ui(results) {
         rows += "</tr>";
     }
 
-    var table = $('table#results tbody');
-    table.empty();
-    table.append(rows);
+    var table = $('table#results');
+    var tbody = table.find('tbody');
+    tbody.empty();
+    tbody.append(rows);
+
+    //tell tablesorter that we changed the data underneath it
+    table.trigger("update"); 
 }
