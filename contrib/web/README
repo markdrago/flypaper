@@ -1,0 +1,3 @@
+If you put this directory on a webserver and drop the json output from
+flypaper in to that directory with a name of 'flypaper.json' you will
+be able to look through the flypaper results on a web page.
