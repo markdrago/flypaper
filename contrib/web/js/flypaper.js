@@ -42,8 +42,10 @@ function update_ui(results) {
 }
 
 function shorten_filename(filename) {
+    var reasonable_length = 85;
+
     //if the full filename isn't that long, just use it
-    if (filename.length < 75) {
+    if (filename.length < reasonable_length) {
         return filename;
     }
 
@@ -57,7 +59,7 @@ function shorten_filename(filename) {
     }
 
     //if the name is still too long, just use the basename
-    if (shortname.length > 75 && parts.length > 0) {
+    if (shortname.length > reasonable_length && parts.length > 0) {
         shortname = parts[parts.length - 1];
     }
 
