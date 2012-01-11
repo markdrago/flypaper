@@ -6,7 +6,11 @@ $(document).ready(function() {
 });
 
 function prepare_ui() {
-    $("table#results").tablesorter();
+    //initialize sorting
+    $("table#results").tablesorter({
+        //disable sorting of the bugs column
+        headers: { 2: { sorter: false } }
+    });
 }
 
 function get_json_via_ajax(filename, callback) {
