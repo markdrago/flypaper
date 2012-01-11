@@ -24,8 +24,9 @@ function update_ui(results) {
     var rows = "";
     for (var i in results.files) {
         var file = results.files[i];
+        var score = new Number(file.score);
         rows += "<tr>";
-        rows += "<td>" + file.score + "</td>";
+        rows += "<td>" + score.toPrecision(4) + "</td>";
         rows += "<td title=\"" + file.filename + "\">" + shorten_filename(file.filename) + "</td>";
         rows += "<td>" + file.bugs.join(', ') + "</td>";
         rows += "</tr>";
