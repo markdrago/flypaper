@@ -1,8 +1,17 @@
 var RESULTS_LOCATION = "flypaper_results.json";
+var OPTIONS_LOCATION = "options.json";
 
 $(document).ready(function() {
-    prepare_ui();
-    get_json_via_ajax(RESULTS_LOCATION, update_ui);
+    get_json_via_ajax(OPTIONS_LOCATION,
+        function(options) {
+            prepare_ui();
+            get_json_via_ajax(RESULTS_LOCATION,
+                function(results) {
+                    update_ui(results, options);
+                }
+            );
+        }
+    );
 });
 
 function prepare_ui() {
@@ -24,7 +33,7 @@ function get_json_via_ajax(filename, callback) {
     });
 }
 
-function update_ui(results) {
+function update_ui(results, options) {
     var rows = "";
     for (var i in results.files) {
         var file = results.files[i];
@@ -32,7 +41,7 @@ function update_ui(results) {
         rows += "<tr>";
         rows += "<td>" + score.toPrecision(4) + "</td>";
         rows += "<td title=\"" + file.filename + "\">" + shorten_filename(file.filename) + "</td>";
-        rows += "<td>" + file.bugs.join(', ') + "</td>";
+        rows += "<td>" + get_buglist(file.bugs, options.bugs.linkformat) + "</td>";
         rows += "</tr>";
     }
 
@@ -43,6 +52,28 @@ function update_ui(results) {
 
     //tell tablesorter that we changed the data underneath it
     table.trigger("update"); 
+}
+
+function get_buglist(bugs, linkformat) {
+    bugs.sort().reverse();
+
+    //create comma-separated list of bug ids
+    var sep = "";
+    var buglist = "";
+    for (var j in bugs) {
+        buglist += sep;
+        var bug = bugs[j];
+
+        //optionally create bug ids in to links
+        if (linkformat != undefined && linkformat != "") {
+            bugtag = "<a href=\"" + linkformat + "\">" + bug + "</a>" ;
+            bug = bugtag.replace("{bugid}", bug);
+        }
+        buglist += bug;
+        sep = ", ";
+    }
+
+    return buglist;
 }
 
 function shorten_filename(filename) {

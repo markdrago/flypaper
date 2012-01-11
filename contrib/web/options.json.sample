@@ -1,0 +1,5 @@
+{
+  "bugs": {
+    "linkformat": "http://my-bug-tracker/showbug?id={bugid}"
+  }
+}
