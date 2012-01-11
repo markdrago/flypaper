@@ -42,7 +42,13 @@ class Changeset(object):
         total_diff = today - startdate
         changeset_diff = self.date - startdate
 
-        return changeset_diff.total_seconds() / total_diff.total_seconds()
+        changeset_seconds = self._get_delta_seconds(changeset_diff)
+        total_seconds = self._get_delta_seconds(total_diff)
+
+        return changeset_seconds / total_seconds
+
+    def _get_delta_seconds(self, td):
+        return float(td.seconds + (td.days * 24 * 3600))
 
     def _calculate_score(self, date_ratio, scale=3):
         return 1 / (1 + math.exp(((-1 * scale) * date_ratio) + scale))
