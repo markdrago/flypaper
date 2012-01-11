@@ -4,7 +4,7 @@ import argparse
 import json
 import sys
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from bug_list import BugList
 from buggyfile_list import BuggyFileList
@@ -117,16 +117,23 @@ if __name__ == '__main__':
                         help='a file which contains bug identifiers')
     parser.add_argument('--repo', default=None, type=unicode,
                         help='directory which contains a code repository')
-    parser.add_argument('--startdate', default='2011-01-01', type=unicode,
+    parser.add_argument('--startdate', default=None, type=unicode,
                         help='date to start looking in the repository')
     parser.add_argument('--showbugs', default=False, action='store_true',
                         help='show bug IDs in output')
     parser.add_argument('--output-format', default='plain', type=unicode,
                         help='set to json to get json output')
+    parser.add_argument('--startoffset', default=None, type=int,
+                        help='seconds ago to start looking in the repo')
     args = parser.parse_args()
 
-    flypaper = FlyPaper(args.buglist,
-                        args.repo,
-                        datetime.strptime(args.startdate, '%Y-%m-%d'),
+    #default to starting one year ago
+    startdate = datetime.now() - timedelta(seconds=31536000)
+    if args.startoffset is not None:
+        startdate = datetime.now() - timedelta(seconds=args.startoffset)
+    elif args.startdate is not None:
+        startdate = datetime.strptime(args.startdate, '%Y-%m-%d')
+
+    flypaper = FlyPaper(args.buglist, args.repo, startdate,
                         args.showbugs, args.output_format)
     flypaper.show_bug_catchers()
